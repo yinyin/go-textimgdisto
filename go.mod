@@ -1,4 +1,4 @@
-module github.com/yinyin/go-textimgdistro
+module github.com/yinyin/go-textimgdisto
 
 go 1.21.1
 
