@@ -9,45 +9,45 @@ import (
 	textimgdisto "github.com/yinyin/go-textimgdisto"
 )
 
-type distroMethod interface {
-	distro(dst *image.Gray) *image.Gray
+type distoMethod interface {
+	disto(dst *image.Gray) *image.Gray
 }
 
-type distroCosHShift struct {
+type distoCosHShift struct {
 	stepRadian float64
 	ampValue   float64
 }
 
-func (m *distroCosHShift) distro(dst *image.Gray) *image.Gray {
+func (m *distoCosHShift) disto(dst *image.Gray) *image.Gray {
 	return textimgdisto.CosHShift(dst, m.stepRadian, m.ampValue)
 }
 
-type distroCosVShift struct {
+type distoCosVShift struct {
 	stepRadian float64
 	ampValue   float64
 }
 
-func (m *distroCosVShift) distro(dst *image.Gray) *image.Gray {
+func (m *distoCosVShift) disto(dst *image.Gray) *image.Gray {
 	return textimgdisto.CosVShift(dst, m.stepRadian, m.ampValue)
 }
 
-type distroBlockyFlip7 struct {
+type distoBlockyFlip7 struct {
 	blockWidth  int
 	blockHeight int
 }
 
-func (m *distroBlockyFlip7) distro(dst *image.Gray) *image.Gray {
+func (m *distoBlockyFlip7) disto(dst *image.Gray) *image.Gray {
 	return textimgdisto.BlockyFlip7(dst, m.blockWidth, m.blockHeight)
 }
 
-type distroInvert struct {
+type distoInvert struct {
 }
 
-func (m *distroInvert) distro(dst *image.Gray) *image.Gray {
+func (m *distoInvert) disto(dst *image.Gray) *image.Gray {
 	return textimgdisto.Invert(dst)
 }
 
-func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
+func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 	aux := strings.Split(cmd, ",")
 	auxCnt := len(aux)
 	if auxCnt < 1 {
@@ -69,7 +69,7 @@ func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
 			log.Printf("WARN: cannot parse cosv amp-value [%v]: %v", aux[2], err)
 			return
 		}
-		m = &distroCosVShift{
+		m = &distoCosVShift{
 			stepRadian: stepRadian,
 			ampValue:   ampValue,
 		}
@@ -89,7 +89,7 @@ func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
 			log.Printf("WARN: cannot parse cosh amp-value [%v]: %v", aux[2], err)
 			return
 		}
-		m = &distroCosHShift{
+		m = &distoCosHShift{
 			stepRadian: stepRadian,
 			ampValue:   ampValue,
 		}
@@ -109,13 +109,13 @@ func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
 			log.Printf("WARN: cannot parse blky block-height [%v]: %v", aux[2], err)
 			return
 		}
-		m = &distroBlockyFlip7{
+		m = &distoBlockyFlip7{
 			blockWidth:  int(blockWidth),
 			blockHeight: int(blockHeight),
 		}
 		ok = true
 	case "inv":
-		m = &distroInvert{}
+		m = &distoInvert{}
 		ok = true
 	}
 	return

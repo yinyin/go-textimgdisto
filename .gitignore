@@ -37,6 +37,6 @@ Icon
 *.out
 .glide/
 
-distro-text-output.jpg
+disto-text-output.jpg
 
-/make-distro-text-image
+/make-disto-text-image

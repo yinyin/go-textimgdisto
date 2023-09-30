@@ -14,7 +14,7 @@ import (
 	textimgdisto "github.com/yinyin/go-textimgdisto"
 )
 
-func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textContent string, distroCommands []distroMethod, outputFileName string, err error) {
+func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textContent string, distoCommands []distoMethod, outputFileName string, err error) {
 	var fontName string
 	var imageWidth, imageHeight int
 	var fontSize float64
@@ -23,7 +23,7 @@ func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textConten
 	flag.IntVar(&imageHeight, "height", 80, "image height")
 	flag.Float64Var(&fontSize, "fontSize", 72.0, "font size")
 	flag.StringVar(&textContent, "text", "123789", "text content to draw")
-	flag.StringVar(&outputFileName, "out", "distro-text-output.jpg", "output file name (should suffix with .jpg or .jpeg)")
+	flag.StringVar(&outputFileName, "out", "disto-text-output.jpg", "output file name (should suffix with .jpg or .jpeg)")
 	flag.Parse()
 	if !strings.HasSuffix(outputFileName, ".jpg") && !strings.HasSuffix(outputFileName, ".jpeg") {
 		log.Printf("WARN: output file name not suffixed with `.jpg` or `.jpeg`.")
@@ -49,31 +49,31 @@ func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textConten
 	}
 	args := flag.Args()
 	for _, arg := range args {
-		m, ok := parseDistroCommand(arg)
+		m, ok := parseDistoCommand(arg)
 		if ok {
-			distroCommands = append(distroCommands, m)
+			distoCommands = append(distoCommands, m)
 		} else {
-			log.Printf("WARN: cannot parse into distro-command: %v", arg)
+			log.Printf("WARN: cannot parse into disto-command: %v", arg)
 		}
 	}
-	if len(distroCommands) == 0 {
-		log.Print("INFO: use default distro: cosh,0.16,6 cosv,0.07,6 blky,32,16 inv")
-		distroCommands = append(distroCommands, &distroCosVShift{
+	if len(distoCommands) == 0 {
+		log.Print("INFO: use default disto: cosh,0.16,6 cosv,0.07,6 blky,32,16 inv")
+		distoCommands = append(distoCommands, &distoCosVShift{
 			stepRadian: 0.16,
 			ampValue:   6,
-		}, &distroCosHShift{
+		}, &distoCosHShift{
 			stepRadian: 0.07,
 			ampValue:   6,
-		}, &distroBlockyFlip7{
+		}, &distoBlockyFlip7{
 			blockWidth:  32,
 			blockHeight: 16,
-		}, &distroInvert{})
+		}, &distoInvert{})
 	}
 	return
 }
 
 func main() {
-	textImageMaker, textContent, distroCommands, outputFileName, err := parseCommandParam()
+	textImageMaker, textContent, distoCommands, outputFileName, err := parseCommandParam()
 	if nil != err {
 		log.Fatalf("cannot have command options: %v", err)
 		return
@@ -82,8 +82,8 @@ func main() {
 	if nil != err {
 		log.Fatalf("cannot make image: %v", err)
 	}
-	for _, distroM := range distroCommands {
-		dst = distroM.distro(dst)
+	for _, distroM := range distoCommands {
+		dst = distroM.disto(dst)
 	}
 	fp, err := os.Create(outputFileName)
 	if nil != err {
