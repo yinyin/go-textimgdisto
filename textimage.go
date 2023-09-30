@@ -5,21 +5,23 @@ import (
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
-	"golang.org/x/image/font/sfnt"
 	"golang.org/x/image/math/fixed"
 )
 
-type TextImageMaker struct {
-	fontRef     *sfnt.Font
+type TextImageMaker interface {
+	NewTextImage(t string) (dst *image.Gray, bearingX, bearingY fixed.Int26_6, err error)
+}
+
+type BasicTextImageMaker struct {
+	fontFaceRef font.Face
 	imageRect   image.Rectangle
 	imageWidth  fixed.Int26_6
 	imageHeight fixed.Int26_6
-	fontSize    float64
 }
 
-func NewTextImageMaker(fontRef *sfnt.Font, imageWidth, imageHeight int, fontSize float64) (maker *TextImageMaker) {
-	maker = &TextImageMaker{
-		fontRef: fontRef,
+func NewBasicTextImageMaker(fontFaceRef font.Face, imageWidth, imageHeight int) (maker *BasicTextImageMaker) {
+	maker = &BasicTextImageMaker{
+		fontFaceRef: fontFaceRef,
 		imageRect: image.Rectangle{
 			Max: image.Point{
 				X: imageWidth,
@@ -28,21 +30,12 @@ func NewTextImageMaker(fontRef *sfnt.Font, imageWidth, imageHeight int, fontSize
 		},
 		imageWidth:  fixed.I(imageWidth),
 		imageHeight: fixed.I(imageHeight),
-		fontSize:    fontSize,
 	}
 	return
 }
 
-func (maker *TextImageMaker) NewTextImage(t string) (dst *image.Gray, bearingX, bearingY fixed.Int26_6, err error) {
-	face, err := opentype.NewFace(maker.fontRef, &opentype.FaceOptions{
-		Size:    maker.fontSize,
-		DPI:     72,
-		Hinting: font.HintingNone,
-	})
-	if nil != err {
-		return
-	}
-	defer face.Close()
+func (maker *BasicTextImageMaker) NewTextImage(t string) (dst *image.Gray, bearingX, bearingY fixed.Int26_6, err error) {
+	face := maker.fontFaceRef
 	dst = image.NewGray(maker.imageRect)
 	d := font.Drawer{
 		Dst:  dst,
@@ -69,4 +62,56 @@ func (maker *TextImageMaker) NewTextImage(t string) (dst *image.Gray, bearingX, 
 	}
 	d.DrawString(t)
 	return
+}
+
+type OpenTypeTextImageMaker struct {
+	fontRef     *opentype.Font
+	fontSize    float64
+	imageRect   image.Rectangle
+	imageWidth  fixed.Int26_6
+	imageHeight fixed.Int26_6
+}
+
+func NewOpenTypeTextImageMaker(fontRef *opentype.Font, imageWidth, imageHeight int, fontSize float64) (maker *OpenTypeTextImageMaker) {
+	maker = &OpenTypeTextImageMaker{
+		fontRef:  fontRef,
+		fontSize: fontSize,
+		imageRect: image.Rectangle{
+			Max: image.Point{
+				X: imageWidth,
+				Y: imageHeight,
+			},
+		},
+		imageWidth:  fixed.I(imageWidth),
+		imageHeight: fixed.I(imageHeight),
+	}
+	return
+}
+
+func NewOpenTypeTextImageMakerWithFontData(fontData []byte, imageWidth, imageHeight int, fontSize float64) (maker *OpenTypeTextImageMaker, err error) {
+	fontRef, err := opentype.Parse(fontData)
+	if nil != err {
+		return
+	}
+	maker = NewOpenTypeTextImageMaker(fontRef, imageWidth, imageHeight, fontSize)
+	return
+}
+
+func (maker *OpenTypeTextImageMaker) NewTextImage(t string) (dst *image.Gray, bearingX, bearingY fixed.Int26_6, err error) {
+	face, err := opentype.NewFace(maker.fontRef, &opentype.FaceOptions{
+		Size:    maker.fontSize,
+		DPI:     72,
+		Hinting: font.HintingNone,
+	})
+	if nil != err {
+		return
+	}
+	defer face.Close()
+	basicMaker := BasicTextImageMaker{
+		fontFaceRef: face,
+		imageRect:   maker.imageRect,
+		imageWidth:  maker.imageWidth,
+		imageHeight: maker.imageHeight,
+	}
+	return basicMaker.NewTextImage(t)
 }
