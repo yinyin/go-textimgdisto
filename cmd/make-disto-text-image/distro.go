@@ -65,6 +65,24 @@ func (m *distoInvert) disto(dst *image.Gray) *image.Gray {
 	return textimgdisto.Invert(dst)
 }
 
+func parseDistoCommandTrigoShift(aux []string, auxCnt int, cmdText string) (stepRadian, ampValue float64, ok bool) {
+	if auxCnt != 3 {
+		log.Printf("WARN: expect `%s,0.12,6.0`; got: %v", cmdText, aux)
+		return
+	}
+	var err error
+	if stepRadian, err = strconv.ParseFloat(aux[1], 64); nil != err {
+		log.Printf("WARN: cannot parse %s step-radian [%v]: %v", cmdText, aux[1], err)
+		return
+	}
+	if ampValue, err = strconv.ParseFloat(aux[2], 64); nil != err {
+		log.Printf("WARN: cannot parse %s amp-value [%v]: %v", cmdText, aux[2], err)
+		return
+	}
+	ok = true
+	return
+}
+
 func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 	aux := strings.Split(cmd, ",")
 	auxCnt := len(aux)
@@ -73,18 +91,8 @@ func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 	}
 	switch aux[0] {
 	case "cosh":
-		if auxCnt != 3 {
-			log.Print("WARN: expect `cosh,0.12,6.0`; got:", aux)
-			return
-		}
-		stepRadian, err := strconv.ParseFloat(aux[1], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse cosh step-radian [%v]: %v", aux[1], err)
-			return
-		}
-		ampValue, err := strconv.ParseFloat(aux[2], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse cosh amp-value [%v]: %v", aux[2], err)
+		stepRadian, ampValue, isParsed := parseDistoCommandTrigoShift(aux, auxCnt, "cosh")
+		if !isParsed {
 			return
 		}
 		m = &distoCosHShift{
@@ -93,18 +101,8 @@ func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 		}
 		ok = true
 	case "cosv":
-		if auxCnt != 3 {
-			log.Print("WARN: expect `cosv,0.07,6.0`; got:", aux)
-			return
-		}
-		stepRadian, err := strconv.ParseFloat(aux[1], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse cosv step-radian [%v]: %v", aux[1], err)
-			return
-		}
-		ampValue, err := strconv.ParseFloat(aux[2], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse cosv amp-value [%v]: %v", aux[2], err)
+		stepRadian, ampValue, isParsed := parseDistoCommandTrigoShift(aux, auxCnt, "cosv")
+		if !isParsed {
 			return
 		}
 		m = &distoCosVShift{
@@ -113,18 +111,8 @@ func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 		}
 		ok = true
 	case "tanh":
-		if auxCnt != 3 {
-			log.Print("WARN: expect `tanh,0.12,6.0`; got:", aux)
-			return
-		}
-		stepRadian, err := strconv.ParseFloat(aux[1], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse tanh step-radian [%v]: %v", aux[1], err)
-			return
-		}
-		ampValue, err := strconv.ParseFloat(aux[2], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse tanh amp-value [%v]: %v", aux[2], err)
+		stepRadian, ampValue, isParsed := parseDistoCommandTrigoShift(aux, auxCnt, "tanh")
+		if !isParsed {
 			return
 		}
 		m = &distoTanHShift{
@@ -133,18 +121,8 @@ func parseDistoCommand(cmd string) (m distoMethod, ok bool) {
 		}
 		ok = true
 	case "tanv":
-		if auxCnt != 3 {
-			log.Print("WARN: expect `tanv,0.12,6.0`; got:", aux)
-			return
-		}
-		stepRadian, err := strconv.ParseFloat(aux[1], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse tanv step-radian [%v]: %v", aux[1], err)
-			return
-		}
-		ampValue, err := strconv.ParseFloat(aux[2], 64)
-		if nil != err {
-			log.Printf("WARN: cannot parse tanv amp-value [%v]: %v", aux[2], err)
+		stepRadian, ampValue, isParsed := parseDistoCommandTrigoShift(aux, auxCnt, "tanv")
+		if !isParsed {
 			return
 		}
 		m = &distoTanVShift{
