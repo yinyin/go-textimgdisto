@@ -40,6 +40,13 @@ func (m *distroBlockyFlip7) distro(dst *image.Gray) *image.Gray {
 	return textimgdisto.BlockyFlip7(dst, m.blockWidth, m.blockHeight)
 }
 
+type distroInvert struct {
+}
+
+func (m *distroInvert) distro(dst *image.Gray) *image.Gray {
+	return textimgdisto.Invert(dst)
+}
+
 func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
 	aux := strings.Split(cmd, ",")
 	auxCnt := len(aux)
@@ -106,6 +113,9 @@ func parseDistroCommand(cmd string) (m distroMethod, ok bool) {
 			blockWidth:  int(blockWidth),
 			blockHeight: int(blockHeight),
 		}
+		ok = true
+	case "inv":
+		m = &distroInvert{}
 		ok = true
 	}
 	return

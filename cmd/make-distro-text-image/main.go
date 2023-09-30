@@ -57,7 +57,7 @@ func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textConten
 		}
 	}
 	if len(distroCommands) == 0 {
-		log.Print("INFO: use default distro: cosh,0.16,6 cosv,0.07,6 blky,32,16")
+		log.Print("INFO: use default distro: cosh,0.16,6 cosv,0.07,6 blky,32,16 inv")
 		distroCommands = append(distroCommands, &distroCosVShift{
 			stepRadian: 0.16,
 			ampValue:   6,
@@ -67,7 +67,7 @@ func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textConten
 		}, &distroBlockyFlip7{
 			blockWidth:  32,
 			blockHeight: 16,
-		})
+		}, &distroInvert{})
 	}
 	return
 }
