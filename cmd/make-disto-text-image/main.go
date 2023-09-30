@@ -57,13 +57,19 @@ func parseCommandParam() (textImageMaker textimgdisto.TextImageMaker, textConten
 		}
 	}
 	if len(distoCommands) == 0 {
-		log.Print("INFO: use default disto: cosh,0.16,6 cosv,0.07,6 blky,32,16 inv")
+		log.Print("INFO: use default disto: cosh,0.16,6 cosv,0.07,6 tanh,0.1,3 tanv,0.05,3 blky,32,16 inv")
 		distoCommands = append(distoCommands, &distoCosVShift{
 			stepRadian: 0.16,
 			ampValue:   6,
 		}, &distoCosHShift{
 			stepRadian: 0.07,
 			ampValue:   6,
+		}, &distoTanVShift{
+			stepRadian: 0.1,
+			ampValue:   3,
+		}, &distoTanHShift{
+			stepRadian: 0.05,
+			ampValue:   3,
 		}, &distoBlockyFlip7{
 			blockWidth:  32,
 			blockHeight: 16,
