@@ -5,11 +5,25 @@ import (
 	"math"
 )
 
-func TanHShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.Gray) {
+const (
+	tanShiftMinRadian = -math.Pi / 4
+	tanShiftMaxRadian = math.Pi / 4
+)
+
+func tanShiftMakeInitRadian(initRadian float64) float64 {
+	if initRadian < tanShiftMinRadian {
+		return tanShiftMinRadian
+	} else if initRadian > tanShiftMaxRadian {
+		return tanShiftMaxRadian
+	}
+	return initRadian
+}
+
+func TanHShift(srcImg *image.Gray, initRadian, stepRadian, ampValue float64) (dstImg *image.Gray) {
 	width := srcImg.Rect.Max.X
 	height := srcImg.Rect.Max.Y
 	dstImg = image.NewGray(srcImg.Rect)
-	radiusValue := -math.Pi / 4
+	radiusValue := tanShiftMakeInitRadian(initRadian)
 	flipValue := 1.0
 	for y := 0; y < height; y++ {
 		radiusValue += stepRadian
@@ -28,11 +42,11 @@ func TanHShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.
 	return
 }
 
-func TanVShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.Gray) {
+func TanVShift(srcImg *image.Gray, initRadian, stepRadian, ampValue float64) (dstImg *image.Gray) {
 	width := srcImg.Rect.Max.X
 	height := srcImg.Rect.Max.Y
 	dstImg = image.NewGray(srcImg.Rect)
-	radiusValue := -math.Pi / 4
+	radiusValue := tanShiftMakeInitRadian(initRadian)
 	flipValue := 1.0
 	for x := 0; x < width; x++ {
 		radiusValue += stepRadian

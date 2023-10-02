@@ -5,11 +5,11 @@ import (
 	"math"
 )
 
-func CosHShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.Gray) {
+func CosHShift(srcImg *image.Gray, initRadian, stepRadian, ampValue float64) (dstImg *image.Gray) {
 	width := srcImg.Rect.Max.X
 	height := srcImg.Rect.Max.Y
 	dstImg = image.NewGray(srcImg.Rect)
-	radiusValue := stepRadian
+	radiusValue := initRadian
 	for y := 0; y < height; y++ {
 		radiusValue += stepRadian
 		if radiusValue > (math.Pi * 2) {
@@ -25,11 +25,11 @@ func CosHShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.
 	return
 }
 
-func CosVShift(srcImg *image.Gray, stepRadian, ampValue float64) (dstImg *image.Gray) {
+func CosVShift(srcImg *image.Gray, initRadian, stepRadian, ampValue float64) (dstImg *image.Gray) {
 	width := srcImg.Rect.Max.X
 	height := srcImg.Rect.Max.Y
 	dstImg = image.NewGray(srcImg.Rect)
-	radiusValue := stepRadian
+	radiusValue := initRadian
 	for x := 0; x < width; x++ {
 		radiusValue += stepRadian
 		if radiusValue > (math.Pi * 2) {
